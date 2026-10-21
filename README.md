@@ -1,6 +1,6 @@
 <div align="center">
 
-Александр Хаслиенко — Machine Learning Engineer
+# Александр Хаслиенко — Machine Learning Engineer
 
 ### ML-engineer · Computer Vision · Edge AI · MLOps · System Design
 
