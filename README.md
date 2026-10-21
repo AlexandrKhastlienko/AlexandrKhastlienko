@@ -1,66 +1,84 @@
 <div align="center">
 
-# Aleksandr Khastlienko
+# Александр Хастлиенко
 
-### Machine Learning Engineer | Computer Vision · Edge AI · MLOps
+### ML-инженер · Computer Vision · Edge AI · MLOps
 
-**Building ML systems that work beyond notebooks.**  
-From image data and model inference to reproducible pipelines and hardware integration.
+Разрабатываю ML-системы, в которых модель — часть работающего продукта: от подготовки данных и инференса до интеграции с оборудованием и управления артефактами.
 
-<p>
-  <img src="https://img.shields.io/badge/Focus-Computer%20Vision-2563EB?style=flat-square" alt="Computer Vision" />
-  <img src="https://img.shields.io/badge/Focus-Edge%20AI-0F766E?style=flat-square" alt="Edge AI" />
-  <img src="https://img.shields.io/badge/Focus-MLOps-7C3AED?style=flat-square" alt="MLOps" />
-</p>
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![Computer Vision](https://img.shields.io/badge/Computer_Vision-2563EB?style=flat-square)
+![Edge AI](https://img.shields.io/badge/Edge_AI-0F766E?style=flat-square)
+![MLOps](https://img.shields.io/badge/MLOps-7C3AED?style=flat-square)
 
 </div>
 
 ---
 
-### About
+## Обо мне
 
-I'm an ML engineer focused on **practical computer vision systems and ML infrastructure**. My work connects models with real-world constraints: industrial cameras, edge devices, data versioning, and reliable inference workflows.
+Я ML-инженер с практическим опытом в компьютерном зрении, обнаружении аномалий и построении инфраструктуры для командной ML-разработки. Работаю не только с моделями, но и с окружением, в котором они используются: Linux, Docker, GPU-инференс, промышленные камеры, встраиваемые устройства и системы хранения данных.
 
-I care about **reproducibility, clear system boundaries, and turning experiments into usable software**.
+Для меня важны воспроизводимость экспериментов, понятная логика принятия решений и возможность проверить результат на реальных данных, а не только в ноутбуке.
 
-### Selected work
+## Проекты
 
-| Project | What I'm working on |
+### 01 · AI Stamping — визуальный контроль качества деталей на конвейере
+
+**Задача.** Автоматизировать контроль металлических деталей: получить изображения с двух ракурсов, обнаружить дефекты поверхности и выдать одно решение по каждой детали для дальнейшей сортировки.
+
+**Как устроена система.** Две промышленные камеры **Hikrobot** последовательно снимают одну деталь. Сигналы датчиков и управление движением конвейера обрабатывает **Arduino Mega 2560**. Снимки связываются с идентификатором детали (`part_id`), чтобы результаты разных камер не смешивались. Вычислительная часть ориентирована на **NVIDIA Jetson Orin**.
+
+На стороне ML используется **YOLO-сегментация** с тремя типами дефектов: `chip` (скол), `unpolished` (неполированная область) и `termo` (термический дефект). Для инференса модель экспортируется в **ONNX**; обработка изображений выполняется в Python. Результаты двух кадров объединяются в одно решение: дефект на любом снимке приводит к статусу `DEFECT`, отсутствие необходимого кадра или ошибка обработки — к `ERROR`, отсутствие выявленных дефектов при корректной паре — к `NORMAL` с учётом правил контроля сторон детали.
+
+**Что сделано в программном пилоте:** загрузка конфигурации, ONNX-инференс пары изображений, оркестрация обработки, сохранение исходных и размеченных кадров, формирование `result.json`, интерфейс оператора и отправка управляющих команд по Serial. Отдельно прорабатываются синхронизация съёмки, управление подачей следующей детали и передача решения сортировщику.
+
+**Статус:** программный пилот реализован; интеграция с реальным конвейером и оборудованием — в разработке.
+
+**Стек:** Python · Ultralytics YOLO · OpenCV · ONNX Runtime · Docker · NVIDIA Jetson · Hikrobot · Arduino / Serial
+
+### 02 · Anti-Fraud — ранжирование подозрительных событий без учителя
+
+**Задача.** Построить систему, которая выделяет нетипичные наблюдения из потока данных и **ранжирует их по степени аномальности**. Основная сложность — сильный **дисбаланс классов**: нормальных наблюдений существенно больше, чем аномальных. При таких условиях обучение обычного бинарного классификатора может быть ограничено количеством и репрезентативностью примеров редких событий.
+
+**Подход.** Вместо обучения на двух классах используется **one-class / unsupervised anomaly detection**: модель изучает структуру нормального поведения, а затем оценивает, насколько новое наблюдение от неё отклоняется. В основе скоринга — **робастное расстояние Махаланобиса**, которое учитывает не только величину отклонений отдельных признаков, но и взаимосвязи между ними. Для повышения устойчивости применяются предварительная обработка признаков и регуляризация оценки ковариации.
+
+**Как работает пайплайн.** Данные проходят подготовку и преобразование признаков → вычисляется числовой **anomaly score** → наблюдения сортируются по убыванию подозрительности. Отдельный этап превращает скоринг в сигналы: калибровка порогов, агрегация результатов во временных окнах и постобработка помогают уменьшить количество кратковременных ложных срабатываний. Таким образом, ранжирование и окончательное решение о сигнале разделены — порог можно настраивать под требования к ложным тревогам.
+
+**Проверка качества.** Для обучения используются нормальные наблюдения; размеченные аномальные случаи нужны для независимой проверки и подбора порогов, а не для обучения двухклассовой модели. В проекте предусмотрена валидация с разделением по сессиям (**LOSO**), чтобы снизить риск утечки между обучением и проверкой. Рассматриваются **FPR, полнота обнаружения, PR-AUC и задержка обнаружения** — при редких событиях одной accuracy недостаточно.
+
+**Стек и методы:** Python · NumPy · Pandas · scikit-learn · Robust Mahalanobis · One-Class Learning · обработка временных рядов · сессионная валидация
+
+> Описание ограничено общими принципами алгоритма: прикладная область, исходные данные и детали внедрения не публикуются.
+
+### 03 · MLOps Infrastructure — инфраструктура разработки и хранения ML-артефактов
+
+**Задача.** Организовать совместную работу над ML-проектами так, чтобы код, датасеты, веса моделей и эксперименты не смешивались в одном репозитории, а нужное состояние проекта можно было восстановить.
+
+**Организация хранения.** **Git / Gitea** используются для исходного кода, конфигураций, истории изменений и работы с ветками. Крупные датасеты и веса моделей версионируются через **DVC**; сами файлы размещаются в S3-совместимом **MinIO**, а Git хранит ссылки на их версии. Это позволяет не загружать тяжёлые бинарные файлы непосредственно в историю Git и связывать изменения кода с соответствующими данными.
+
+**Эксперименты и окружение.** Для фиксации запусков, параметров и метрик используется **MLflow**. Сервисы разворачиваются через **Docker Compose**; в инфраструктуре применяются **PostgreSQL**, Linux и локальная сеть, в том числе для рабочих мест без прямого доступа к интернету. Такая архитектура разделяет задачи Git, объектного хранилища и трекинга экспериментов, вместо попытки решить их одним инструментом.
+
+**Практический результат:** организована серверная инфраструктура для командной ML-разработки и хранения версионируемых артефактов. Развитие автоматизированных пайплайнов и единых командных правил — отдельная текущая задача; полноценную CI/CD-платформу здесь не заявляю.
+
+**Стек:** Git · Gitea · DVC · MinIO (S3) · MLflow · Docker Compose · PostgreSQL · Ubuntu
+
+## Технологии
+
+| Направление | Инструменты |
 | :--- | :--- |
-| **Industrial Visual Inspection — AI Stamping** | A two-camera quality inspection pipeline with image classification and defect segmentation, designed to integrate NVIDIA Jetson, industrial cameras, and Arduino-controlled conveyor hardware. |
-| **Anti-Fraud** | Applied machine learning in the anti-fraud domain. Project details are not public. |
-| **MLOps Infrastructure** | Git-based workflows for dataset and model versioning, experiment tracking, and S3-compatible artifact storage. |
-
-> Some work is developed in private environments. Public repositories and technical write-ups can be linked here as they become available.
-
-### Tech stack
-
-**ML & Computer Vision**  
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
-![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white)
-![YOLO](https://img.shields.io/badge/YOLO-111827?style=flat-square)
-![ONNX Runtime](https://img.shields.io/badge/ONNX%20Runtime-005CED?style=flat-square&logo=onnx&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)
-
-**MLOps & Infrastructure**  
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
-![DVC](https://img.shields.io/badge/DVC-13ADC7?style=flat-square&logo=dvc&logoColor=white)
-![MLflow](https://img.shields.io/badge/MLflow-0194E2?style=flat-square&logo=mlflow&logoColor=white)
-![MinIO](https://img.shields.io/badge/MinIO-C72E49?style=flat-square&logo=minio&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)
-![NVIDIA Jetson](https://img.shields.io/badge/NVIDIA%20Jetson-76B900?style=flat-square&logo=nvidia&logoColor=white)
-
-**Local AI tooling**  
-![Ollama](https://img.shields.io/badge/Ollama-111827?style=flat-square)
-![Open WebUI](https://img.shields.io/badge/Open%20WebUI-334155?style=flat-square)
-![MCP](https://img.shields.io/badge/MCP-7C3AED?style=flat-square)
+| **Язык и анализ данных** | Python, NumPy, Pandas, Matplotlib, Jupyter |
+| **ML / CV** | PyTorch, scikit-learn, Ultralytics YOLO, OpenCV |
+| **Инференс** | ONNX Runtime, NVIDIA CUDA, NVIDIA Jetson |
+| **MLOps** | Git, GitHub, Gitea, DVC, MLflow, MinIO (S3) |
+| **Инфраструктура** | Docker, Docker Compose, Linux / Ubuntu, WSL2, PostgreSQL |
+| **Локальные AI-инструменты** | Ollama, Open WebUI, MCP |
+| **Разработка и интеграция** | VS Code, промышленные камеры Hikrobot, Arduino, Serial |
 
 ---
 
 <div align="center">
-  <sub>Computer Vision · Reliable inference · Reproducible ML</sub>
+
+*От данных и математической модели — к воспроизводимому инференсу и реальной системе.*
+
 </div>
