@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,50:2563EB,100:7C3AED&height=190&section=header&text=Александр%20Хастлиенко&fontSize=37&fontColor=FFFFFF&fontAlignY=37&desc=Machine%20Learning%20Engineer&descSize=20&descAlignY=60" alt="Александр Хастлиенко — Machine Learning Engineer" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,50:2563EB,100:7C3AED&height=190&section=header&text=Александр%20Хастлиенко&fontSize=37&fontColor=FFFFFF&fontAlignY=37&desc=Machine%20Learning%20Engineer&descSize=20&descAlignY=60" alt="Александр Хаслиенко — Machine Learning Engineer" width="100%" />
 
 ### ML-инженер · Computer Vision · Edge AI · MLOps
 
