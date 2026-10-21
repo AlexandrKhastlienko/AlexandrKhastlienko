@@ -1,4 +1,8 @@
-<div align="center">
+<p align="center">
+
+  <img src="./EA92039F-DE25-484B-82CE-BE6C8B5D18B6.png" alt="Александр Хаслиенко" width="100%">
+
+</p>
 
 # Александр Хаслиенко — Machine Learning Engineer
 
