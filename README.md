@@ -4,11 +4,11 @@
 
 </p>
 
-# Александр Хаслиенко — Machine Learning Engineer
+# Александр Хаслиенко
 
-### ML-engineer · Computer Vision · Edge AI · MLOps · System Design
+### ML-engineer · System Design · MLOps · Computer Vision · Edge AI   
 
-Разрабатываю ML-системы, в которых модель — часть работающего продукта: от подготовки данных и инференса до интеграции с оборудованием и управления артефактами.
+Разрабатываю ML-системы от подготовки данных и инференса до интеграции с оборудованием и управления артефактами.
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
